@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业人力资源管理系统 - 首页总览</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入Font Awesome -->
+    <link href="/static/css/all.min.css" rel="stylesheet">
+    <!-- 引入ECharts -->
+    <script src="/static/js/echarts.min.js"></script>
+    <!-- 引入jQuery -->
+    <script src="/static/js/jquery-3.6.0.min.js"></script>
+    <!-- 引入Bootstrap JS -->
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* 自定义样式 */
+        body {
+            background-color: #f5f7fa;
+        }
+        .dashboard-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        .card-icon {
+            font-size: 2rem;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .chart-container {
+            height: 400px;
+            width: 100%;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #6c757d;
+        }
+        .info-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .list-item-hover:hover {
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+        }
+        .text-normal {
+            color: #28a745;
+        }
+        .text-late {
+            color: #ffc107;
+        }
+        .text-absent {
+            color: #dc3545;
+        }
+        .text-leave {
+            color: #17a2b8;
+        }
+        /* 滚动条样式 */
+        .info-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .info-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .info-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        .info-list::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <!-- 页面标题 -->
+        <div class="mb-4">
+            <h1 class="text-center">企业人力资源管理系统 - 首页总览</h1>
+            <p class="text-center text-secondary">欢迎使用人力资源管理系统，当前时间：{{ current_time|date:"Y年m月d日 H:i:s" }}</p>
+        </div>
+
+        <!-- 数据卡片部分 -->
+        <div class="row mb-6">
+            <!-- 人员总数 -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between items-center">
+                            <div>
+                                <p class="stat-label">人员总数</p>
+                                <p class="stat-number">{{ stats_data.employee.total }}</p>
+                            </div>
+                            <div class="card-icon bg-primary text-white">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge badge-info mr-2">试用期: {{ stats_data.employee.probation }}</span>
+                            <span class="badge badge-success mr-2">正式: {{ stats_data.employee.regular }}</span>
+                            <span class="badge badge-secondary">本月新入职: {{ stats_data.employee.new_this_month }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 今日考勤 -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between items-center">
+                            <div>
+                                <p class="stat-label">今日考勤</p>
+                                <p class="stat-number">{{ stats_data.attendance.today_attendance }}</p>
+                            </div>
+                            <div class="card-icon bg-success text-white">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge text-normal border border-success text-success mr-2">正常: {{ stats_data.attendance.normal_today }}</span>
+                            <span class="badge text-late border border-warning text-warning mr-2">迟到: {{ stats_data.attendance.late_today }}</span>
+                            <span class="badge text-absent border border-danger text-danger">缺勤: {{ stats_data.attendance.absent_today }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 招聘需求 -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between items-center">
+                            <div>
+                                <p class="stat-label">招聘需求</p>
+                                <p class="stat-number">{{ stats_data.recruitment.open_requirements }}</p>
+                            </div>
+                            <div class="card-icon bg-info text-white">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge badge-secondary mr-2">待处理候选人: {{ stats_data.recruitment.candidates_pending }}</span>
+                            <span class="badge badge-warning">已安排面试: {{ stats_data.recruitment.interviews_scheduled }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 待审批事项 -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between items-center">
+                            <div>
+                                <p class="stat-label">待审批事项</p>
+                                <p class="stat-number">{{ stats_data.attendance.leave_requests_pending }}</p>
+                            </div>
+                            <div class="card-icon bg-warning text-white">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge badge-primary mr-2">绩效计划: {{ stats_data.performance.active_appraisal_plans }}</span>
+                            <span class="badge badge-purple border border-purple text-purple">薪资配置: {{ stats_data.salary.total_employees_with_salary }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表部分 -->
+        <div class="row mb-6">
+            <!-- 部门人员分布饼图 -->
+            <div class="col-lg-6 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie mr-2"></i>部门人员分布
+                    </div>
+                    <div class="card-body">
+                        <div id="departmentChart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 本月考勤趋势柱状图 -->
+            <div class="col-lg-6 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar mr-2"></i>本月考勤趋势
+                    </div>
+                    <div class="card-body">
+                        <div id="attendanceTrendChart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新增AI数据分析总结区域 -->
+        <div class="row mb-6">
+            <div class="col-lg-12 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-lightbulb mr-2"></i>AI数据分析总结
+                    </div>
+                    <div class="card-body">
+                        <div id="ai-summary-content" class="text-muted">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">加载中...</span>
+                            </div>
+                            <span> 正在生成部门人员分布分析...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最新信息部分 -->
+        <div class="row mb-4">
+            <!-- 最新入职员工 -->
+            <div class="col-lg-4 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-user-plus mr-2"></i>最新入职员工
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush info-list">
+                            {% for employee in latest_info.latest_employees %}
+                            <li class="list-group-item list-item-hover">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ employee.name }}</strong>
+                                        <p class="text-sm text-secondary">{{ employee.department.name }} - {{ employee.position.name }}</p>
+                                    </div>
+                                    <span class="badge badge-primary">{{ employee.entry_date|date:"m-d" }}</span>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item">暂无数据</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 今日考勤记录 -->
+            <div class="col-lg-4 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-clock mr-2"></i>今日考勤记录
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush info-list">
+                            {% for record in latest_info.latest_attendance %}
+                            <li class="list-group-item list-item-hover">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ record.employee.name }}</strong>
+                                        <p class="text-sm text-secondary">
+                                            {% if record.check_in_time %}{{ record.check_in_time|time:"H:i" }}{% else %}未签到{% endif %}
+                                            -
+                                            {% if record.check_out_time %}{{ record.check_out_time|time:"H:i" }}{% else %}未签退{% endif %}
+                                        </p>
+                                    </div>
+                                    <span class="badge
+                                        {% if record.status == 'normal' %}badge-success
+                                        {% elif record.status == 'late' %}badge-warning
+                                        {% elif record.status == 'absent' %}badge-danger
+                                        {% elif record.status == 'leave' %}badge-info
+                                        {% endif %}">
+                                        {{ record.get_status_display }}
+                                    </span>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item">暂无数据</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最新请假申请 -->
+            <div class="col-lg-4 mb-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-alt mr-2"></i>最新请假申请
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush info-list">
+                            {% for request in latest_info.latest_leave_requests %}
+                            <li class="list-group-item list-item-hover">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ request.employee.name }}</strong>
+                                        <p class="text-sm text-secondary">{{ request.leave_type.name }} - {{ request.days }}天</p>
+                                    </div>
+                                    <span class="badge
+                                        {% if request.status == 'pending' %}badge-warning
+                                        {% elif request.status == 'approved' %}badge-success
+                                        {% elif request.status == 'rejected' %}badge-danger
+                                        {% endif %}">
+                                        {{ request.get_status_display }}
+                                    </span>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item">暂无数据</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 近期面试安排 -->
+        <div class="row">
+            <div class="col-lg-12 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-check mr-2"></i>近期面试安排
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>应聘者</th>
+                                        <th>面试类型</th>
+                                        <th>面试时间</th>
+                                        <th>面试岗位</th>
+                                        <th>面试官</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for interview in latest_info.latest_interviews %}
+                                    <tr class="list-item-hover">
+                                        <td>{{ interview.candidate.name }}</td>
+                                        <td>{{ interview.get_interview_type_display }}</td>
+                                        <td>{{ interview.interview_time|date:"Y-m-d H:i" }}</td>
+                                        <td>
+                                            {% if interview.candidate.recruitment_requirement %}
+                                                {{ interview.candidate.recruitment_requirement.position.name }}
+                                            {% else %}
+                                                无
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% for interviewer in interview.interviewers.all %}
+                                                {{ interviewer.name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            <span class="badge
+                                                {% if interview.status == 'scheduled' %}badge-primary
+                                                {% elif interview.status == 'completed' %}badge-success
+                                                {% elif interview.status == 'canceled' %}badge-danger
+                                                {% endif %}">
+                                                {{ interview.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">暂无面试安排</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图表初始化脚本 -->
+    <script>
+        // 初始化部门人员分布饼图
+        var departmentChart = echarts.init(document.getElementById('departmentChart'));
+        var departmentOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 10,
+                data: [
+                    {% for dept in department_distribution %}
+                        '{{ dept.name }}',
+                    {% endfor %}
+                ]
+            },
+            series: [
+                {
+                    name: '人员分布',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '16',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        {% for dept in department_distribution %}
+                            {value: {{ dept.employee_count }}, name: '{{ dept.name }}'},
+                        {% endfor %}
+                    ]
+                }
+            ]
+        };
+        departmentChart.setOption(departmentOption);
+
+        // 初始化本月考勤趋势柱状图
+        var attendanceTrendChart = echarts.init(document.getElementById('attendanceTrendChart'));
+
+        // 准备数据
+        var dates = [];
+        var normalData = [];
+        var lateData = [];
+        var absentData = [];
+
+        {% for day in attendance_trend %}
+            dates.push('{{ day.date }}');
+            normalData.push({{ day.normal }});
+            lateData.push({{ day.late }});
+            absentData.push({{ day.absent }});
+        {% endfor %}
+
+        var attendanceTrendOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['正常', '迟到', '缺勤']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: dates
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '正常',
+                    type: 'bar',
+                    stack: 'total',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: normalData,
+                    itemStyle: {
+                        color: '#28a745'
+                    }
+                },
+                {
+                    name: '迟到',
+                    type: 'bar',
+                    stack: 'total',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: lateData,
+                    itemStyle: {
+                        color: '#ffc107'
+                    }
+                },
+                {
+                    name: '缺勤',
+                    type: 'bar',
+                    stack: 'total',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: absentData,
+                    itemStyle: {
+                        color: '#dc3545'
+                    }
+                }
+            ]
+        };
+        attendanceTrendChart.setOption(attendanceTrendOption);
+
+        // 新增AI总结加载逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 请求包含AI总结的部门人员数据
+            fetch("/personnel/employee_stats_data/?summary=true")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("网络响应不正常");
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    // 展示AI总结
+                    const summaryElement = document.getElementById('ai-summary-content');
+                    summaryElement.innerHTML = `<p>${result.summary}</p>`;
+                })
+                .catch(error => {
+                    const summaryElement = document.getElementById('ai-summary-content');
+                    summaryElement.innerHTML = `<div class="text-danger">数据分析加载失败：${error.message}</div>`;
+                    console.error("AI总结加载错误：", error);
+                });
+        });
+
+        // 响应式处理
+        window.addEventListener('resize', function() {
+            departmentChart.resize();
+            attendanceTrendChart.resize();
+        });
+    </script>
+</body>
+</html>

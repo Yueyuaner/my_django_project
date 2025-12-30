@@ -1,0 +1,101 @@
+/* 标注容器样式 */
+#annotation-container {
+    position: relative;
+    overflow: auto;
+    max-height: 70vh;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+}
+
+/* 标注画布样式 */
+#annotation-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: all;
+}
+
+/* 标注框样式 */
+.annotation-box {
+    position: absolute;
+    border: 2px solid;
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: move;
+    pointer-events: all;
+}
+
+/* 选中的标注框样式 */
+.annotation-box.selected {
+    border-width: 3px;
+    border-style: dashed;
+    z-index: 1000;
+}
+
+/* 调整大小的手柄 */
+.resize-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    pointer-events: all;
+    z-index: 101;
+}
+
+.resize-handle.nw { top: -6px; left: -6px; cursor: nwse-resize; }
+.resize-handle.ne { top: -6px; right: -6px; cursor: nesw-resize; }
+.resize-handle.sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.resize-handle.se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+
+/* 标签样式 */
+.annotation-label {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    background-color: inherit;
+    color: white;
+    padding: 0 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* 颜色框样式 */
+.color-box {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+
+/* 标注列表项样式 */
+#annotation-list .list-group-item {
+    padding: 0.5rem 1rem;
+}
+
+/* 标签列表项样式 */
+#label-list .list-group-item {
+    padding: 0.5rem 1rem;
+}
+
+/* 图片样式 */
+#annotation-image {
+    display: block;
+    max-width: 100%;
+    transition: transform 0.2s ease;
+}
+
+/* 选中的列表项 */
+#annotation-list .list-group-item.active {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #212529;
+    font-weight: bold;
+} 
